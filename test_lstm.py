@@ -1,13 +1,3 @@
-#https://youtu.be/6S2v7G-OupA
-"""
-@author: Sreenivas Bhattiprolu
-Shows errors on Tensorflow 1.4 and Keras 2.0.8
-Works fine in Tensorflow: 2.2.0
-    Keras: 2.4.3
-dataset: https://finance.yahoo.com/quote/GE/history/
-Also try S&P: https://finance.yahoo.com/quote/%5EGSPC/history?p=%5EGSPC
-"""
-
 import numpy as np
 from keras.models import Sequential
 from keras.layers import LSTM, Input, Dropout
@@ -21,7 +11,7 @@ from keras.models import Model
 import seaborn as sns
 
     
-dataframe = pd.read_csv('/home/lucien/Documents/projet-data-science-pollution-master/donnees_txt_par_mois/2015_gamma_concat.txt')
+dataframe = pd.read_csv('/home/lucien/Documents/projet-data-science-pollution-master/donnees_txt_par_mois/2015_gamma_concat_test.txt')
 df = dataframe[['Date', 'gamma']]
 #df['Date'] = pd.to_datetime(df['Date'])
 
@@ -39,9 +29,13 @@ print("End date is: ", df['Date'].max())
 
 
 #Change train data from Mid 2017 to 2019.... seems to be a jump early 2017
-train, test = df.loc[df['Date'] <= '130000'], df.loc[df['Date'] > '130000'] #on coupe à 130 000 pour avoir un des gros pics que l'on remarque sur le graphique
 
+#pour le test sur petite data_base:
+train, test = df.loc[df['Date'] <= 9000], df.loc[df['Date'] > 9000]
+#Pour le test sur notre data_base (quand on aura gpu)
+#train, test = df.loc[df['Date'] <= '130000'], df.loc[df['Date'] > '130000'] #on coupe à 130 000 pour avoir un des gros pics que l'on remarque sur le graphique
 
+print("you are here")
 #Convert pandas dataframe to numpy array
 #dataset = dataframe.values
 #dataset = dataset.astype('float32') #COnvert values to float
@@ -55,6 +49,7 @@ scaler = scaler.fit(train[['gamma']])
 train['gamma'] = scaler.transform(train[['gamma']])
 test['gamma'] = scaler.transform(test[['gamma']])
 
+print("you are here2")
 
 #As required for LSTM networks, we require to reshape an input data into n_samples x timesteps x n_features. 
 #In this example, the n_features is 2. We will make timesteps = 3. 
@@ -75,7 +70,7 @@ def to_sequences(x, y, seq_size=1):
         
     return np.array(x_values), np.array(y_values)
 
-trainX, trainY = to_sequences(train[['gamma']], train['gamma'], seq_size)
+trainX, trainY = to_sequences(train[['gamma']], train['gamma'], seq_size) #on découpe en séquence de 300
 testX, testY = to_sequences(test[['gamma']], test['gamma'], seq_size)
 
 
@@ -96,10 +91,14 @@ testX, testY = to_sequences(test[['gamma']], test['gamma'], seq_size)
 # model.compile(optimizer='adam', loss='mse')
 # model.summary()
 
+print("hello")
+
+#input: (N,30,1) avec N le nombre de timestamps
+
 #Try another model
 model = Sequential()
-model.add(LSTM(128, input_shape=(trainX.shape[1], trainX.shape[2])))
-model.add(Dropout(rate=0.2))
+model.add(LSTM(128, input_shape=(trainX.shape[1], trainX.shape[2]))) #128 car on a 128 neurones dans la couche cachée
+model.add(Dropout(rate=0.2)) #rate?
 
 model.add(RepeatVector(trainX.shape[1]))
 
@@ -111,7 +110,7 @@ model.summary()
 
 #on lance le training
 # fit model
-history = model.fit(trainX, trainY, epochs=2, batch_size=32, validation_split=0.1, verbose=1)
+history = model.fit(trainX, trainY, epochs=2, batch_size=32, validation_split=0.1, verbose=1) #nombre faible d'epoch pour l'instant, on veut juste tester
 
 plt.plot(history.history['loss'], label='Training loss')
 plt.plot(history.history['val_loss'], label='Validation loss')
