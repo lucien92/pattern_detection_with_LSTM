@@ -1,3 +1,4 @@
+
 import numpy as np
 from keras.models import Sequential
 from keras.layers import LSTM, Input, Dropout
@@ -10,7 +11,7 @@ from sklearn.preprocessing import MinMaxScaler, StandardScaler
 from keras.models import Model
 import seaborn as sns
 
-    
+#pour l'instant on test avec 10 000 données de gamma
 dataframe = pd.read_csv('/home/lucien/Documents/projet-data-science-pollution-master/donnees_txt_par_mois/2015_gamma_concat_test.txt')
 df = dataframe[['Date', 'gamma']]
 #df['Date'] = pd.to_datetime(df['Date'])
@@ -24,8 +25,8 @@ df = dataframe[['Date', 'gamma']]
 sns.lineplot(x=df['Date'], y=df['gamma'])
 plt.show()
 
-print("Start date is: ", df['Date'].min())
-print("End date is: ", df['Date'].max())
+# print("Start date is: ", df['Date'].min())
+# print("End date is: ", df['Date'].max())
 
 
 #Change train data from Mid 2017 to 2019.... seems to be a jump early 2017
@@ -55,7 +56,7 @@ print("you are here2")
 #In this example, the n_features is 2. We will make timesteps = 3. 
 #With this, the resultant n_samples is 5 (as the input data has 9 rows).
 
-seq_size = 300  # Number of time steps to look back (on choisit 300 en s'appuyant sur notre travail avec la matrix profile)
+seq_size = 10  # Number of time steps to look back (on choisit 300 en s'appuyant sur notre travail avec la matrix profile)
 #Larger sequences (look further back) may improve forecasting.
 
 
@@ -110,7 +111,7 @@ model.summary()
 
 #on lance le training
 # fit model
-history = model.fit(trainX, trainY, epochs=2, batch_size=32, validation_split=0.1, verbose=1) #nombre faible d'epoch pour l'instant, on veut juste tester
+history = model.fit(trainX, trainY, epochs=10, batch_size=32, validation_split=0.1, verbose=1) #nombre faible d'epoch pour l'instant, on veut juste tester
 
 plt.plot(history.history['loss'], label='Training loss')
 plt.plot(history.history['val_loss'], label='Validation loss')
