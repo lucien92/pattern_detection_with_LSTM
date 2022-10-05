@@ -101,6 +101,17 @@ with open('/home/lucien/Documents/projet-data-science-pollution-master/donnees_t
         i += 1
         spamwriter_gamma.writerow([i, item])
 
+#on veut générer une time series test moins longue extraite de gamma pour tester le LSTM
+
+with open('/home/lucien/Documents/projet-data-science-pollution-master/donnees_txt_par_mois/2015_gamma_concat_test.txt', 'w', newline='') as f_gamma:
+    spamwriter_gamma = csv.writer(f_gamma, delimiter=',')
+    spamwriter_gamma.writerow(['Date', 'gamma'])
+    i = 0
+    for item in gamma:
+        if i<100:
+            i += 1
+            spamwriter_gamma.writerow([i, item])
+
 
 # with open('/home/lucien/Documents/projet-data-science-pollution-master/donnees_txt_par_mois/2015_months_HYGR_concat.txt', 'w', newline='') as f_HYGR:
 #     spamwriter_HYGR = csv.writer(f_HYGR, delimiter=',')
